@@ -25,20 +25,18 @@ final class Main {
             System.out.println("network is waiting for any connection");
             Socket socket = serverSocket.accept();
             System.out.println("Connection established");
-            String receivedMessage;
-            String messageToSend;
             try (BufferedReader bufferedReader = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
                  PrintWriter output = new PrintWriter(socket.getOutputStream(), true)) {
 
-                performNetworkCommunication(bufferedReader,output,scanner);
+                performNetworkCommunication(bufferedReader, output, scanner);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void performNetworkCommunication(BufferedReader bufferedReader, PrintWriter output, Scanner scanner)
+    private static void performNetworkCommunication(final BufferedReader bufferedReader, final PrintWriter output, final Scanner scanner)
             throws IOException {
         boolean terminalLeaving;
         boolean consoleLeaving = false;
@@ -50,7 +48,9 @@ final class Main {
             System.out.println("The person on the other end: " + receivedMessage);
 
             terminalLeaving = receivedMessage.trim().equalsIgnoreCase(LEAVING_NETWORK_KEYWORD);
-            if (terminalLeaving) break;
+            if (terminalLeaving) {
+                break;
+            }
 
             messageToSend = getMessageFromConsole(scanner);
             sendMessage(output, "The person on the other end: " + messageToSend);
@@ -61,19 +61,19 @@ final class Main {
         processDisconnection(consoleLeaving, output);
     }
 
-    private static String readMessage(BufferedReader bufferedReader) throws IOException {
+    private static String readMessage(final BufferedReader bufferedReader) throws IOException {
         return bufferedReader.readLine();
     }
 
-    private static String getMessageFromConsole(Scanner scanner) {
+    private static String getMessageFromConsole(final Scanner scanner) {
         return scanner.nextLine();
     }
 
-    private static void sendMessage(PrintWriter output, String message) {
+    private static void sendMessage(final PrintWriter output, final String message) {
         output.println(message);
     }
 
-    private static void processDisconnection(boolean consoleLeaving, PrintWriter output) {
+    private static void processDisconnection(final boolean consoleLeaving, final PrintWriter output) {
         if (consoleLeaving) {
             sendMessage(output, "The person on the other end disconnected");
             System.out.println("You disconnected from the network");
