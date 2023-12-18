@@ -30,28 +30,56 @@ final class Main {
             try (BufferedReader bufferedReader = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
                  PrintWriter output = new PrintWriter(socket.getOutputStream(), true)) {
-                boolean isTerminalPersonTryingToLeave;
-                boolean isConsolePersonTryingToLeave=false;
-                do {
-                    receivedMessage = bufferedReader.readLine();
-                    System.out.println("The person on the other end: " + receivedMessage);
-                    isTerminalPersonTryingToLeave = receivedMessage.trim().equalsIgnoreCase(LEAVING_NETWORK_KEYWORD);
-                    if (isTerminalPersonTryingToLeave) break;
-                    messageToSend = scanner.nextLine();
-                    output.println("The person on the other end: " + messageToSend);
-                    isConsolePersonTryingToLeave = messageToSend.trim().equalsIgnoreCase(LEAVING_NETWORK_KEYWORD);
-                } while (!isConsolePersonTryingToLeave);
 
-                if (isConsolePersonTryingToLeave) {
-                    output.println("The person on the other end disconnected");
-                    System.out.println("You disconnected from the network");
-                } else {
-                    System.out.println("The person on the other end disconnected");
-                    output.println("You disconnected from the network");
-                }
+                performNetworkCommunication(bufferedReader,output,scanner);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void performNetworkCommunication(BufferedReader bufferedReader, PrintWriter output, Scanner scanner)
+            throws IOException {
+        boolean terminalLeaving;
+        boolean consoleLeaving = false;
+        String receivedMessage;
+        String messageToSend;
+
+        do {
+            receivedMessage = readMessage(bufferedReader);
+            System.out.println("The person on the other end: " + receivedMessage);
+
+            terminalLeaving = receivedMessage.trim().equalsIgnoreCase(LEAVING_NETWORK_KEYWORD);
+            if (terminalLeaving) break;
+
+            messageToSend = getMessageFromConsole(scanner);
+            sendMessage(output, "The person on the other end: " + messageToSend);
+
+            consoleLeaving = messageToSend.trim().equalsIgnoreCase(LEAVING_NETWORK_KEYWORD);
+        } while (!consoleLeaving);
+
+        processDisconnection(consoleLeaving, output);
+    }
+
+    private static String readMessage(BufferedReader bufferedReader) throws IOException {
+        return bufferedReader.readLine();
+    }
+
+    private static String getMessageFromConsole(Scanner scanner) {
+        return scanner.nextLine();
+    }
+
+    private static void sendMessage(PrintWriter output, String message) {
+        output.println(message);
+    }
+
+    private static void processDisconnection(boolean consoleLeaving, PrintWriter output) {
+        if (consoleLeaving) {
+            sendMessage(output, "The person on the other end disconnected");
+            System.out.println("You disconnected from the network");
+        } else {
+            System.out.println("The person on the other end disconnected");
+            sendMessage(output, "You disconnected from the network");
         }
     }
 }
