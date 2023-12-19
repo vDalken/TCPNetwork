@@ -10,7 +10,7 @@ final class Main {
     /**
      * keyword to disconnect from the network.
      */
-    private static final String LEAVING_NETWORK_KEYWORD = "sair";
+    private static final String LEAVING_NETWORK_KEYWORD = "leave";
     /**
      * port number of the server socket.
      */
